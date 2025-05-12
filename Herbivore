@@ -1,0 +1,64 @@
+class Herbivore extends Agent {
+
+    public Herbivore(int x, int y, Ecosystem ecosystem) {
+        super(x, y, ecosystem);
+        energy = 80;
+    }
+
+    @Override
+    public void update() {
+        energy -= 0.3; // метаболизм
+
+        // Получаем входные данные от среды
+        double[] inputs = sense();
+
+        // Решаем действия
+        double[] outputs = brain.forward(inputs);
+
+        int dx = 0, dy = 0;
+        if (outputs[0] > 0.5) dx = 1;
+        else if (outputs[1] > 0.5) dx = -1;
+
+        if (outputs[2] > 0.5) dy = 1;
+        else if (outputs[3] > 0.5) dy = -1;
+
+        move(dx, dy);
+
+        // Поиск и поедание растения на текущей клетке
+        Agent plant = ecosystem.getPlantAt(x, y);
+        if (plant != null) {
+            energy += 30;
+            ecosystem.removeAgent(plant);
+        }
+
+        // Размножение, если достаточно энергии
+        if (energy > 150) {
+            energy /= 2;
+            int nx = x + (int)(Math.random() * 3 -1);
+            int ny = y + (int)(Math.random() * 3 -1);
+
+            if(nx >=0 && nx < ecosystem.width && ny >=0 && ny < ecosystem.height)
+                ecosystem.addAgent(new Herbivore(nx, ny, ecosystem));
+        }
+    }
+
+    // Входы: расстояния до ближайших растений 4 направления (N,E,S,W), текущая энергия нормированная [0..1]
+    private double[] sense() {
+        double[] inputs = new double[5];
+        inputs[0] = ecosystem.distanceToNearestPlant(x, y-1);
+        inputs[1] = ecosystem.distanceToNearestPlant(x+1, y);
+        inputs[2] = ecosystem.distanceToNearestPlant(x, y+1);
+        inputs[3] = ecosystem.distanceToNearestPlant(x-1, y);
+        inputs[4] = energy / 200.0;
+        return inputs;
+    }
+
+    @Override
+    public int getInputSize() { return 5; }
+
+    @Override
+    public int getOutputSize() { return 4; }  //движение
+
+    @Override
+    public Color getColor() { return Color.ORANGE; }
+}
