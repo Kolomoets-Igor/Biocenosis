@@ -1,0 +1,62 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class BioEcosystemFrame extends JFrame {
+
+    Ecosystem ecosystem;
+    DrawPanel drawPanel;
+
+    public BioEcosystemFrame(int width, int height) {
+        ecosystem = new Ecosystem(width, height);
+
+        // Инициализируем агентов
+        for(int i=0; i<50; i++) {
+
+            ecosystem.addAgent(new Plant((int)(Math.random()*width), (int)(Math.random()*height), ecosystem));
+        }
+        for(int i=0; i<20; i++) {
+            ecosystem.addAgent(new Herbivore((int)(Math.random()*width), (int)(Math.random()*height), ecosystem));
+        }
+        for(int i=0; i<5; i++) {
+            ecosystem.addAgent(new Predator((int)(Math.random()*width), (int)(Math.random()*height), ecosystem));
+        }
+
+        setTitle("Биоценоз: растения-травоядные-хищники");
+        setSize(width*8, height*8 + 40);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        drawPanel = new DrawPanel();
+        add(drawPanel, BorderLayout.CENTER);
+
+        Timer timer = new Timer(50, e -> {
+            ecosystem.update();
+            drawPanel.repaint();
+        });
+        timer.start();
+    }
+
+    private class DrawPanel extends JPanel {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            setBackground(Color.BLACK);
+            for (Agent ag : ecosystem.agents) {
+                ag.draw(g);
+            }
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            return new Dimension(ecosystem.width*8, ecosystem.height*8);
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            BioEcosystemFrame frame = new BioEcosystemFrame(80, 60);
+            frame.setVisible(true);
+        });
+    }
+}
