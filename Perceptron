@@ -1,0 +1,40 @@
+class Perceptron {
+    int inputSize;
+    int outputSize;
+    double[][] weights; // [output][input]
+    double[] biases;
+    Random rand = new Random();
+
+    public Perceptron(int inputSize, int outputSize) {
+        this.inputSize = inputSize;
+        this.outputSize = outputSize;
+        weights = new double[outputSize][inputSize];
+        biases = new double[outputSize];
+    }
+
+    public void randomizeWeights() {
+        for (int i = 0; i < outputSize; i++) {
+            biases[i] = rand.nextDouble() * 2 - 1;
+            for (int j = 0; j < inputSize; j++) {
+                weights[i][j] = rand.nextDouble() * 2 - 1;
+            }
+        }
+    }
+
+    public double[] forward(double[] inputs) {
+        double[] outputs = new double[outputSize];
+
+        for (int i = 0; i < outputSize; i++) {
+            double sum = biases[i];
+            for (int j = 0; j < inputSize; j++) {
+                sum += weights[i][j] * inputs[j];
+            }
+            outputs[i] = sigmoid(sum);
+        }
+        return outputs;
+    }
+
+    private double sigmoid(double x) {
+        return 1.0 / (1.0 + Math.exp(-x));
+    }
+}
