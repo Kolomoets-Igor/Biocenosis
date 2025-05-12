@@ -1,0 +1,32 @@
+class Plant extends Agent {
+
+    public Plant(int x, int y, Ecosystem eco) {
+        super(x, y, eco);
+        energy = 50;
+    }
+
+    @Override
+    public void update() {
+        // Растения просто восстанавливают энергию
+        energy = Math.min(energy + 0.1, 100);
+
+        // Размножение с низкой вероятностью, если энергии достаточно
+        if (energy > 90 && Math.random() < 0.005) {
+            int nx = x + (int)(Math.random() * 21 - 10);
+            int ny = y + (int)(Math.random() * 21 - 10);
+            if (nx >= 0 && nx < ecosystem.width && ny >= 0 && ny < ecosystem.height)
+                ecosystem.addAgent(new Plant(nx, ny, ecosystem));
+
+            energy -= 20;
+        }
+    }
+
+    @Override
+    public int getInputSize() { return 0; }
+
+    @Override
+    public int getOutputSize() { return 0; }
+
+    @Override
+    public Color getColor() { return Color.GREEN; }
+}
