@@ -1,0 +1,70 @@
+import java.util.ArrayList;
+import java.util.Iterator;
+
+class Ecosystem {
+    int width, height;
+    ArrayList<Agent> agents;
+
+    public Ecosystem(int width, int height) {
+        this.width = width;
+        this.height = height;
+        agents = new ArrayList<>();
+    }
+
+    public void addAgent(Agent agent) {
+        agents.add(agent);
+    }
+
+    public void removeAgent(Agent agent) {
+        agents.remove(agent);
+    }
+
+    public void update() {
+        Iterator<Agent> it = agents.iterator();
+        while (it.hasNext()) {
+            Agent ag = it.next();
+            ag.update();
+            if (ag.isDead()) it.remove();
+        }
+    }
+
+    // Поиск ближайшего растения к координате
+    public double distanceToNearestPlant(int x, int y) {
+        double minDist = 1000;
+
+        for (Agent ag : agents) {
+            if (ag instanceof Plant) {
+                double dist = Math.hypot(ag.x - x, ag.y - y);
+                if (dist < minDist) minDist = dist;
+            }
+        }
+        // Нормируем расстояния (чем дальше — тем ближе к 0)
+        return 1.0 / (1 + minDist);
+    }
+
+    public Agent getPlantAt(int x, int y) {
+        for (Agent ag : agents) {
+            if (ag instanceof Plant && ag.x == x && ag.y == y) return ag;
+        }
+        return null;
+    }
+
+    // Аналогично для травоядных
+    public double distanceToNearestHerbivore(int x, int y) {
+        double minDist = 1000;
+        for (Agent ag : agents) {
+            if (ag instanceof Herbivore) {
+                double dist = Math.hypot(ag.x - x, ag.y - y);
+                if (dist < minDist) minDist = dist;
+            }
+        }
+        return 1.0 / (1 + minDist);
+    }
+
+    public Agent getHerbivoreAt(int x, int y) {
+        for (Agent ag : agents) {
+            if (ag instanceof Herbivore && ag.x == x && ag.y == y) return ag;
+        }
+        return null;
+    }
+}
