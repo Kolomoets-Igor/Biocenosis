@@ -1,0 +1,48 @@
+import java.awt.*;
+import java.util.Random;
+
+abstract class Agent {
+    protected int x, y;
+    protected double energy;
+    protected Perceptron brain;
+    protected Ecosystem ecosystem;
+    protected int size = 6;
+
+    public Agent(int x, int y, Ecosystem ecosystem) {
+        this.x = x;
+        this.y = y;
+        this.ecosystem = ecosystem;
+        this.energy = 100;
+        this.brain = new Perceptron(getInputSize(), getOutputSize());
+        this.brain.randomizeWeights();
+    }
+
+    public abstract void update();
+
+    public abstract int getInputSize();
+
+    public abstract int getOutputSize();
+
+    public abstract Color getColor();
+
+    public int getX() { return x; }
+    public int getY() { return y; }
+
+    public boolean isDead() {
+        return energy <= 0;
+    }
+
+    public void draw(Graphics g) {
+        g.setColor(getColor());
+        g.fillOval(x - size / 2, y - size / 2, size, size);
+    }
+
+    protected void move(int dx, int dy) {
+        int newX = x + dx;
+        int newY = y + dy;
+        if (newX >= 0 && newX < ecosystem.width && newY >= 0 && newY < ecosystem.height) {
+            x = newX;
+            y = newY;
+        }
+    }
+}
